@@ -1,26 +1,142 @@
-import * as T from 'three';
-const el=id=>document.getElementById(id), view=el('view');
-const scene=new T.Scene();scene.background=new T.Color(0x6994a8);scene.fog=new T.FogExp2(0x779bac,.009);
-const camera=new T.PerspectiveCamera(43,1,.1,350), renderer=new T.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(1,1);view.append(renderer.domElement);renderer.toneMapping=T.ACESFilmicToneMapping;
-scene.add(new T.HemisphereLight(0xd8f5ff,0x496477,2.1));const sun=new T.DirectionalLight(0xffe4bc,2.4);sun.position.set(-25,30,-10);scene.add(sun);
-const sea=new T.PlaneGeometry(350,350,110,110);sea.rotateX(-Math.PI/2);const seaMat=new T.MeshPhongMaterial({color:0x246b85,shininess:55,vertexColors:true});const colors=[];for(let i=0;i<sea.attributes.position.count;i++){const c=new T.Color().setHSL(.55,.43,.36+Math.random()*.10);colors.push(c.r,c.g,c.b)}sea.setAttribute('color',new T.Float32BufferAttribute(colors,3));seaMat.color.set(0x67b8cd);const water=new T.Mesh(sea,seaMat);water.position.y=-.45;scene.add(water);
-const ship=new T.Group();scene.add(ship);
-function box(parent,w,h,d,x,y,z,color){const m=new T.Mesh(new T.BoxGeometry(w,h,d),new T.MeshStandardMaterial({color,roughness:.75}));m.position.set(x,y,z);parent.add(m);return m}
-function hull(points,y,depth,color){const s=new T.Shape();points.forEach(([x,z],i)=>i?s.lineTo(x,-z):s.moveTo(x,-z));s.closePath();const g=new T.ExtrudeGeometry(s,{depth,bevelEnabled:false});g.rotateX(-Math.PI/2);const m=new T.Mesh(g,new T.MeshStandardMaterial({color}));m.position.y=y;ship.add(m)}
-const outline=[[-20,-4.7],[-13,-6.5],[13,-6.5],[20,-3],[21,0],[17,5.7],[-20,6.5]];hull(outline.map(([x,z])=>[x*.97,z*.83]),-1,2.4,0x263b49);hull(outline,1.4,.38,0x556471);
-box(ship,36,.025,.13,-1,1.79,-.8,0xe1ded0).rotation.y=.09;box(ship,34,.025,.08,-2,1.79,4.6,0xf7c672);for(let i=0;i<17;i++)box(ship,.85,.028,.11,i*2-17,1.79,1.2,0xf2e8cf);for(let i=0;i<6;i++)box(ship,.12,.03,2.1,-18+i*.55,1.8,-2.5,0xedeee0);
-for(const [w,h,d,x,y,z] of [[7,1.5,2.8,4,2.5,-4.5],[5,1.1,2.4,5,3.8,-4.5],[3,.9,2,5.7,4.8,-4.5],[.23,3,.23,5.7,6.6,-4.5],[2.8,.15,.5,5.7,7.4,-4.5]])box(ship,w,h,d,x,y,z,0x879da7);for(let i=0;i<8;i++)box(ship,.37,.25,.04,3.2+i*.46,4,-3.28,0x122c3c);
-for(const [x,z] of [[-15,3.3],[-11,3.3],[14,-3.2]]){const g=new T.Group();ship.add(g);g.position.set(x,1.92,z);box(g,3,.20,.46,0,0,0,0x7692a1);box(g,1.45,.09,1.7,-.2,0,0,0x92abb6);box(g,.55,.10,.92,-1.15,.1,0,0x839ca9);box(g,.6,.2,.27,.4,.11,0,0x263b49)}
-const text=document.createElement('canvas');text.width=256;text.height=96;const ctx=text.getContext('2d');ctx.fillStyle='#dde5e4';ctx.font='bold 73px monospace';ctx.fillText('07',20,73);const decal=new T.Mesh(new T.PlaneGeometry(6,2.25),new T.MeshBasicMaterial({map:new T.CanvasTexture(text),transparent:true,depthWrite:false}));decal.rotation.x=-Math.PI/2;decal.position.set(15,1.795,2.4);ship.add(decal);
-const targets=[[-11,7,-2],[1,10,3],[14,7,-1]].map((p,i)=>{const node=new T.Group();node.position.set(...p);scene.add(node);const ring=new T.Mesh(new T.TorusGeometry(.65,.045,8,32),new T.MeshBasicMaterial({color:0x6affdb}));node.add(ring);const core=new T.Mesh(new T.OctahedronGeometry(.36),new T.MeshBasicMaterial({color:0xafffea,wireframe:true}));node.add(core);const button=document.createElement('button');button.className='target';button.textContent=`0${i+1}`;button.setAttribute('aria-label',`انتخاب هدف ${i+1}`);button.onclick=()=>select(i);view.append(button);return{node,ring,core,button,base:p[1]}});
-const modes=[['شهاب','SH-01',0x69ffda,.72,100],['آذر','AZ-02',0xffc76b,.48,150],['سروش','SR-03',0xadabff,1.12,200]];let mode=0,selected=0,score=0,hits=0,shots=0,flight=null,flash=null;
-const choice=modes.map(([name,code],i)=>{const b=document.createElement('button');b.innerHTML=`${name}<span>${code}</span>`;b.onclick=()=>{mode=i;sync()};el('choices').append(b);return b});
-function sync(){choice.forEach((b,i)=>{b.classList.toggle('active',i===mode);b.setAttribute('aria-pressed',i===mode)});targets.forEach(({button,ring},i)=>{button.classList.toggle('active',i===selected);button.setAttribute('aria-pressed',i===selected);ring.material.color.setHex(i===selected?0xffce72:0x6affdb)});for(const [id,n,len] of [['score',score,3],['hits',hits,2],['shots',shots,2]])el(id).textContent=String(n).padStart(len,'0');el('fire').disabled=!!flight}
-function select(i){selected=i;sync()}
-function remove(m){scene.remove(m);m.geometry.dispose();m.material.dispose()}
-function fire(){if(flight)return;const [, ,color,duration,points]=modes[mode];const mesh=new T.Mesh(new T.SphereGeometry(.31,12,10),new T.MeshBasicMaterial({color}));const start=camera.position.clone().lerp(new T.Vector3(0,1,6),.35);mesh.position.copy(start);scene.add(mesh);flight={mesh,start,duration,points,color,index:selected,time:performance.now()};shots++;el('toast').textContent='پرتابه در مسیر است…';sync()}
-el('fire').onclick=fire;el('reset').onclick=()=>{if(flight)remove(flight.mesh);if(flash)remove(flash.mesh);flight=flash=null;score=hits=shots=mode=selected=0;el('toast').textContent='';sync()};window.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.tagName!=='BUTTON'){e.preventDefault();fire()}if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();select((selected+(e.key==='ArrowRight'?1:2))%3)}});
-function resize(){const w=view.clientWidth,h=view.clientHeight;camera.aspect=w/h;if(w<=720){camera.position.set(12,25,55);camera.lookAt(0,-8,0);camera.fov=w<440?63:52}else{camera.position.set(20,22,49);camera.lookAt(7,3,0);camera.fov=w<1050?51:43}camera.updateProjectionMatrix();renderer.setSize(w,h)}window.addEventListener('resize',resize);resize();sync();
-const projected=new T.Vector3();renderer.setAnimationLoop(ms=>{const t=ms*.001;const a=sea.attributes.position;for(let i=0;i<a.count;i++){const x=a.getX(i),z=a.getZ(i);a.setY(i,Math.sin(x*.51+z*.28+t*1.55)*.21+Math.sin(z*.72-t*1.2)*.13)}a.needsUpdate=true;sea.computeVertexNormals();ship.rotation.z=Math.sin(t*.65)*.009;
-for(const [i,{node,base,core,ring,button}] of targets.entries()){node.position.y=base+.45*Math.sin(t*1.4+i);ring.quaternion.copy(camera.quaternion);core.rotation.y=t+i;projected.copy(node.position).project(camera);button.style.left=`${(projected.x+1)*50}%`;button.style.top=`${(1-projected.y)*50}%`}
-if(flight){const f=flight,p=Math.min(1,(ms-f.time)/(f.duration*1000)),dest=targets[f.index].node.position;f.mesh.position.lerpVectors(f.start,dest,p);f.mesh.position.y+=Math.sin(Math.PI*p)*2.5;if(p>=1){if(flash)remove(flash.mesh);const mesh=new T.Mesh(new T.SphereGeometry(.65,12,10),new T.MeshBasicMaterial({color:f.color,transparent:true,wireframe:true}));mesh.position.copy(dest);scene.add(mesh);flash={mesh,time:ms};remove(f.mesh);score+=f.points;hits++;flight=null;el('toast').textContent=`اصابت موفق! +${f.points}`;select((f.index+1)%3)}}if(flash){const p=(ms-flash.time)/650;flash.mesh.scale.setScalar(1+p*4);flash.mesh.material.opacity=Math.max(0,1-p);if(p>=1){remove(flash.mesh);flash=null}}renderer.render(scene,camera)});
+import { emptyBoard, size, spawn, slide, hasMoves } from './game.mjs';
+
+const get = id => document.getElementById(id);
+const surface = get('board');
+const tiles = surface.querySelector('.tiles');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const storageKey = 'puzzle-club-2048-best';
+let best = 0;
+try { best = Math.max(0, Number(localStorage.getItem(storageKey)) || 0); } catch { /* Storage can be blocked. */ }
+let board, score, previous, won, outcome, timer, swipe;
+
+for (let i = 0; i < size * size; i++) {
+  const cell = document.createElement('div');
+  cell.className = 'cell';
+  surface.querySelector('.cells').append(cell);
+}
+
+function position(index) {
+  return { left: `${index % size * 25.5}%`, top: `${Math.floor(index / size) * 25.5}%` };
+}
+
+function tile(index, value) {
+  const item = document.createElement('div');
+  item.className = 'tile';
+  item.textContent = value;
+  item.dataset.value = value;
+  if (value >= 1024) item.dataset.large = '';
+  if (value > 2048) item.style.background = `hsl(${(Math.log2(value) * 47) % 360} 76% 76%)`;
+  Object.assign(item.style, position(index));
+  tiles.append(item);
+  return item;
+}
+
+function draw(merged = [], added = null) {
+  tiles.replaceChildren();
+  board.forEach((value, index) => {
+    if (!value) return;
+    const item = tile(index, value);
+    if (!reducedMotion.matches && (merged.includes(index) || added === index)) {
+      const frames = merged.includes(index) ? [{scale: 0.88}, {scale: 1.12}, {scale: 1}] : [{scale: 0.5, opacity: 0}, {scale: 1, opacity: 1}];
+      item.animate(frames, { duration: 150, easing: 'ease-out' });
+    }
+  });
+}
+
+function sync() {
+  get('score').textContent = score;
+  get('best').textContent = best;
+  get('undo').disabled = !previous;
+  get('result').hidden = !outcome;
+  surface.setAttribute('aria-label', 'صفحهٔ چهار در چهار: ' + board.map(value => value || 'خالی').join('، '));
+  if (!outcome) return;
+  const victory = outcome === 'win';
+  get('result-title').textContent = victory ? 'به ۲۰۴۸ رسیدی!' : 'بازی تمام شد';
+  get('result-text').textContent = victory ? 'می‌توانی برای رکورد بالاتر ادامه بدهی.' : 'دیگر حرکت معتبری باقی نمانده است.';
+  get('result-action').textContent = victory ? 'ادامه بازی' : 'شروع مجدد';
+  get('result-action').focus();
+}
+
+function restart() {
+  clearTimeout(timer);
+  timer = null;
+  previous = outcome = null;
+  won = false;
+  score = 0;
+  board = emptyBoard();
+  spawn(board);
+  spawn(board);
+  draw();
+  sync();
+}
+
+function move(direction) {
+  if (outcome || timer) return;
+  const { next, motions, merged, points, changed } = slide(board, direction);
+  if (!changed) return;
+  previous = { board, score, won };
+  board = next;
+  score += points;
+  if (score > best) {
+    best = score;
+    try { localStorage.setItem(storageKey, String(best)); } catch { /* Keep the in-memory record. */ }
+  }
+  const added = spawn(board);
+  const finish = () => {
+    timer = null;
+    if (!won && board.includes(2048)) {
+      won = true;
+      outcome = 'win';
+    } else if (!hasMoves(board)) outcome = 'loss';
+    draw(merged, added);
+    sync();
+  };
+  if (reducedMotion.matches) return finish();
+  tiles.replaceChildren();
+  for (const { from, to, value } of motions) {
+    tile(from, value).animate([position(from), position(to)], { duration: 105, easing: 'ease-out', fill: 'forwards' });
+  }
+  timer = setTimeout(finish, 105);
+}
+
+get('restart').onclick = () => { restart(); surface.focus(); };
+get('undo').onclick = () => {
+  if (!previous) return;
+  clearTimeout(timer);
+  timer = null;
+  ({ board, score, won } = previous);
+  previous = outcome = null;
+  draw();
+  sync();
+  surface.focus();
+};
+get('result-action').onclick = () => {
+  if (outcome === 'loss') restart();
+  else {
+    outcome = hasMoves(board) ? null : 'loss';
+    sync();
+  }
+  if (!outcome) surface.focus();
+};
+
+window.addEventListener('keydown', event => {
+  const directions = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
+  if (!Object.hasOwn(directions, event.key) || event.ctrlKey || event.altKey || event.metaKey) return;
+  event.preventDefault();
+  move(directions[event.key]);
+});
+surface.addEventListener('pointerdown', event => {
+  if (!event.isPrimary || event.button !== 0) return;
+  swipe = { id: event.pointerId, x: event.clientX, y: event.clientY };
+  surface.setPointerCapture(event.pointerId);
+});
+surface.addEventListener('pointerup', event => {
+  if (swipe?.id !== event.pointerId) return;
+  const x = event.clientX - swipe.x;
+  const y = event.clientY - swipe.y;
+  swipe = null;
+  if (Math.max(Math.abs(x), Math.abs(y)) < 20) return;
+  move(Math.abs(x) > Math.abs(y) ? (x > 0 ? 'right' : 'left') : (y > 0 ? 'down' : 'up'));
+});
+surface.addEventListener('pointercancel', event => { if (swipe?.id === event.pointerId) swipe = null; });
+restart();
