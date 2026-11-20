@@ -2,9 +2,8 @@
   "name": "ai-game",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test",
     "dev": "vite --host 0.0.0.0",
     "build": "vite build"
   },
@@ -19,9 +18,6 @@
     "url": "https://github.com/fashori2020-eng/ai-game/issues"
   },
   "homepage": "https://github.com/fashori2020-eng/ai-game#readme",
-  "dependencies": {
-    "three": "^0.187.0"
-  },
   "devDependencies": {
     "vite": "^8.3.8"
   }
