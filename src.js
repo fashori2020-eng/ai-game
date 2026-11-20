@@ -1,26 +1,43 @@
-import * as T from 'three';
-const el=id=>document.getElementById(id), view=el('view');
-const scene=new T.Scene();scene.background=new T.Color(0x6994a8);scene.fog=new T.FogExp2(0x779bac,.009);
-const camera=new T.PerspectiveCamera(43,1,.1,350), renderer=new T.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(1,1);view.append(renderer.domElement);renderer.toneMapping=T.ACESFilmicToneMapping;
-scene.add(new T.HemisphereLight(0xd8f5ff,0x496477,2.1));const sun=new T.DirectionalLight(0xffe4bc,2.4);sun.position.set(-25,30,-10);scene.add(sun);
-const sea=new T.PlaneGeometry(350,350,110,110);sea.rotateX(-Math.PI/2);const seaMat=new T.MeshPhongMaterial({color:0x246b85,shininess:55,vertexColors:true});const colors=[];for(let i=0;i<sea.attributes.position.count;i++){const c=new T.Color().setHSL(.55,.43,.36+Math.random()*.10);colors.push(c.r,c.g,c.b)}sea.setAttribute('color',new T.Float32BufferAttribute(colors,3));seaMat.color.set(0x67b8cd);const water=new T.Mesh(sea,seaMat);water.position.y=-.45;scene.add(water);
-const ship=new T.Group();scene.add(ship);
-function box(parent,w,h,d,x,y,z,color){const m=new T.Mesh(new T.BoxGeometry(w,h,d),new T.MeshStandardMaterial({color,roughness:.75}));m.position.set(x,y,z);parent.add(m);return m}
-function hull(points,y,depth,color){const s=new T.Shape();points.forEach(([x,z],i)=>i?s.lineTo(x,-z):s.moveTo(x,-z));s.closePath();const g=new T.ExtrudeGeometry(s,{depth,bevelEnabled:false});g.rotateX(-Math.PI/2);const m=new T.Mesh(g,new T.MeshStandardMaterial({color}));m.position.y=y;ship.add(m)}
-const outline=[[-20,-4.7],[-13,-6.5],[13,-6.5],[20,-3],[21,0],[17,5.7],[-20,6.5]];hull(outline.map(([x,z])=>[x*.97,z*.83]),-1,2.4,0x263b49);hull(outline,1.4,.38,0x556471);
-box(ship,36,.025,.13,-1,1.79,-.8,0xe1ded0).rotation.y=.09;box(ship,34,.025,.08,-2,1.79,4.6,0xf7c672);for(let i=0;i<17;i++)box(ship,.85,.028,.11,i*2-17,1.79,1.2,0xf2e8cf);for(let i=0;i<6;i++)box(ship,.12,.03,2.1,-18+i*.55,1.8,-2.5,0xedeee0);
-for(const [w,h,d,x,y,z] of [[7,1.5,2.8,4,2.5,-4.5],[5,1.1,2.4,5,3.8,-4.5],[3,.9,2,5.7,4.8,-4.5],[.23,3,.23,5.7,6.6,-4.5],[2.8,.15,.5,5.7,7.4,-4.5]])box(ship,w,h,d,x,y,z,0x879da7);for(let i=0;i<8;i++)box(ship,.37,.25,.04,3.2+i*.46,4,-3.28,0x122c3c);
-for(const [x,z] of [[-15,3.3],[-11,3.3],[14,-3.2]]){const g=new T.Group();ship.add(g);g.position.set(x,1.92,z);box(g,3,.20,.46,0,0,0,0x7692a1);box(g,1.45,.09,1.7,-.2,0,0,0x92abb6);box(g,.55,.10,.92,-1.15,.1,0,0x839ca9);box(g,.6,.2,.27,.4,.11,0,0x263b49)}
-const text=document.createElement('canvas');text.width=256;text.height=96;const ctx=text.getContext('2d');ctx.fillStyle='#dde5e4';ctx.font='bold 73px monospace';ctx.fillText('07',20,73);const decal=new T.Mesh(new T.PlaneGeometry(6,2.25),new T.MeshBasicMaterial({map:new T.CanvasTexture(text),transparent:true,depthWrite:false}));decal.rotation.x=-Math.PI/2;decal.position.set(15,1.795,2.4);ship.add(decal);
-const targets=[[-11,7,-2],[1,10,3],[14,7,-1]].map((p,i)=>{const node=new T.Group();node.position.set(...p);scene.add(node);const ring=new T.Mesh(new T.TorusGeometry(.65,.045,8,32),new T.MeshBasicMaterial({color:0x6affdb}));node.add(ring);const core=new T.Mesh(new T.OctahedronGeometry(.36),new T.MeshBasicMaterial({color:0xafffea,wireframe:true}));node.add(core);const button=document.createElement('button');button.className='target';button.textContent=`0${i+1}`;button.setAttribute('aria-label',`انتخاب هدف ${i+1}`);button.onclick=()=>select(i);view.append(button);return{node,ring,core,button,base:p[1]}});
-const modes=[['شهاب','SH-01',0x69ffda,.72,100],['آذر','AZ-02',0xffc76b,.48,150],['سروش','SR-03',0xadabff,1.12,200]];let mode=0,selected=0,score=0,hits=0,shots=0,flight=null,flash=null;
-const choice=modes.map(([name,code],i)=>{const b=document.createElement('button');b.innerHTML=`${name}<span>${code}</span>`;b.onclick=()=>{mode=i;sync()};el('choices').append(b);return b});
-function sync(){choice.forEach((b,i)=>{b.classList.toggle('active',i===mode);b.setAttribute('aria-pressed',i===mode)});targets.forEach(({button,ring},i)=>{button.classList.toggle('active',i===selected);button.setAttribute('aria-pressed',i===selected);ring.material.color.setHex(i===selected?0xffce72:0x6affdb)});for(const [id,n,len] of [['score',score,3],['hits',hits,2],['shots',shots,2]])el(id).textContent=String(n).padStart(len,'0');el('fire').disabled=!!flight}
-function select(i){selected=i;sync()}
-function remove(m){scene.remove(m);m.geometry.dispose();m.material.dispose()}
-function fire(){if(flight)return;const [, ,color,duration,points]=modes[mode];const mesh=new T.Mesh(new T.SphereGeometry(.31,12,10),new T.MeshBasicMaterial({color}));const start=camera.position.clone().lerp(new T.Vector3(0,1,6),.35);mesh.position.copy(start);scene.add(mesh);flight={mesh,start,duration,points,color,index:selected,time:performance.now()};shots++;el('toast').textContent='پرتابه در مسیر است…';sync()}
-el('fire').onclick=fire;el('reset').onclick=()=>{if(flight)remove(flight.mesh);if(flash)remove(flash.mesh);flight=flash=null;score=hits=shots=mode=selected=0;el('toast').textContent='';sync()};window.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.tagName!=='BUTTON'){e.preventDefault();fire()}if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();select((selected+(e.key==='ArrowRight'?1:2))%3)}});
-function resize(){const w=view.clientWidth,h=view.clientHeight;camera.aspect=w/h;if(w<=720){camera.position.set(12,25,55);camera.lookAt(0,-8,0);camera.fov=w<440?63:52}else{camera.position.set(20,22,49);camera.lookAt(7,3,0);camera.fov=w<1050?51:43}camera.updateProjectionMatrix();renderer.setSize(w,h)}window.addEventListener('resize',resize);resize();sync();
-const projected=new T.Vector3();renderer.setAnimationLoop(ms=>{const t=ms*.001;const a=sea.attributes.position;for(let i=0;i<a.count;i++){const x=a.getX(i),z=a.getZ(i);a.setY(i,Math.sin(x*.51+z*.28+t*1.55)*.21+Math.sin(z*.72-t*1.2)*.13)}a.needsUpdate=true;sea.computeVertexNormals();ship.rotation.z=Math.sin(t*.65)*.009;
-for(const [i,{node,base,core,ring,button}] of targets.entries()){node.position.y=base+.45*Math.sin(t*1.4+i);ring.quaternion.copy(camera.quaternion);core.rotation.y=t+i;projected.copy(node.position).project(camera);button.style.left=`${(projected.x+1)*50}%`;button.style.top=`${(1-projected.y)*50}%`}
-if(flight){const f=flight,p=Math.min(1,(ms-f.time)/(f.duration*1000)),dest=targets[f.index].node.position;f.mesh.position.lerpVectors(f.start,dest,p);f.mesh.position.y+=Math.sin(Math.PI*p)*2.5;if(p>=1){if(flash)remove(flash.mesh);const mesh=new T.Mesh(new T.SphereGeometry(.65,12,10),new T.MeshBasicMaterial({color:f.color,transparent:true,wireframe:true}));mesh.position.copy(dest);scene.add(mesh);flash={mesh,time:ms};remove(f.mesh);score+=f.points;hits++;flight=null;el('toast').textContent=`اصابت موفق! +${f.points}`;select((f.index+1)%3)}}if(flash){const p=(ms-flash.time)/650;flash.mesh.scale.setScalar(1+p*4);flash.mesh.material.opacity=Math.max(0,1-p);if(p>=1){remove(flash.mesh);flash=null}}renderer.render(scene,camera)});
+const data=[['مدیریت بازیکن','Player Management','♙','PlayerState','سلامت و بازنشانی وضعیت بازیکن',`public static int x = 100;
+void Start() { x = 100; }
+public void ResetPlayer() { x = 100; }
+public void Hit(int n) { x -= n; }`,`const int MaxHealth = 100;
+public int Health { get; private set; } = MaxHealth;
+public void ResetPlayer() => Health = MaxHealth;
+public void Hit(int damage) {
+    Health -= Mathf.Clamp(damage, 0, Health);
+}`,['نام x معنای سلامت بازیکن را منتقل نمی‌کند.','مقدار ۱۰۰ در چند نقطه تکرار شده است.','سلامت سراسری بین تمام بازیکن‌ها مشترک است.','آسیب منفی یا بیش از سلامت بررسی نمی‌شود.']],['سرویس چندنفره','Multiplayer Service','⌘','Lobby','اعلان محلی ورود بازیکن به لابی',`public static event System.Action e;
+void OnEnable() { e += Log; }
+void Log() { Debug.Log("joined"); }
+public void Join() { e?.Invoke(); }`,`public event System.Action Joined;
+void OnEnable() => Joined += LogJoin;
+void OnDisable() => Joined -= LogJoin;
+void LogJoin() => Debug.Log("joined");
+public void Join() => Joined?.Invoke();`,['اشتراک رویداد پس از غیرفعال‌شدن باقی می‌ماند.','نام e هدف رویداد را پنهان می‌کند.','رویداد سراسری لابی‌های مستقل را به هم متصل می‌کند.']],['بارگذاری نقشه','Map Loading','▱','MapLoader','انتخاب صحنه‌ی مسابقه',`public void Go(int x) {
+    if (x == 1) UnityEngine.SceneManagement.SceneManager.LoadScene("Arena");
+    if (x == 2) UnityEngine.SceneManagement.SceneManager.LoadScene("Valley");
+}`,`[SerializeField] string[] maps;
+public void LoadMap(int index) {
+    if (maps == null || index < 0 || index >= maps.Length ||
+        !Application.CanStreamedLevelBeLoaded(maps[index])) {
+        Debug.LogWarning("Map unavailable");
+        return;
+    }
+    UnityEngine.SceneManagement.SceneManager.LoadScene(maps[index]);
+}`,['شناسه‌های عددی بدون توضیح هستند.','فراخوانی بارگذاری برای هر نقشه تکرار می‌شود.','انتخاب نامعتبر بدون پیام نادیده گرفته می‌شود.']],['سیستم امتیاز','Score System','♜','ScoreBoard','ثبت امتیاز در مسابقه',`public static int s;
+public void Win() { s += 10; }
+public void Bonus() { s += 10; }`,`const int Reward = 10;
+public int Score { get; private set; }
+public void Win() => AddReward();
+public void Bonus() => AddReward();
+void AddReward() => Score += Reward;`,['متغیر عمومی از هر نقطه تغییر می‌کند.','عدد امتیاز در دو متد تکرار شده است.','نام s مفهوم امتیاز را مشخص نمی‌کند.']],['مدیریت سلاح','Weapon Management','⊹','WeaponState','شمارش مهمات مجازی بازیکن',`public static int a = 30;
+public void Fire() { a--; }
+public void Reload() { a = 30; }`,`const int Capacity = 30;
+public int Ammo { get; private set; } = Capacity;
+public bool TryFire() {
+    if (Ammo == 0) return false;
+    Ammo--;
+    return true;
+}
+public void Reload() => Ammo = Capacity;`,['تمام سلاح‌ها یک شمارنده‌ی مشترک دارند.','مهمات می‌تواند منفی شود.','ظرفیت خشاب به شکل عدد جادویی تکرار شده است.']]];
+const summary=['نام‌های معنادار، هدف متغیرها را روشن می‌کنند.','مقادیر ثابت را به جای اعداد جادویی نام‌گذاری کنید.','رفتار تکراری را در یک متد نگه دارید.','وضعیت هر نمونه را از وضعیت سراسری جدا کنید.','ورودی‌ها و چرخه‌ی عمر رویدادها را بررسی کنید.'];let idx=0;const fa=n=>n.toLocaleString('fa-IR'),num=n=>String(n+1).padStart(2,'0'),code=(d,good)=>`${good?'':'// ضعف‌های عمده: '+d[7].slice(0,2).join(' ')+'\n'}using UnityEngine;\n\npublic class ${d[3]} : MonoBehaviour\n{\n${d[good?6:5].split('\n').map(l=>'    '+l).join('\n')}\n}`;const markdown=data.map((d,i)=>`## ${fa(i+1)}. ${d[0]}\n\n### کد ضعیف\n\n\`\`\`csharp\n${code(d,false)}\n\`\`\`\n\n${d[7].map((s,j)=>`${j+1}. ${s}`).join('\n')}\n\n### نسخه‌ی درست\n\n\`\`\`csharp\n${code(d,true)}\n\`\`\``).join('\n\n')+'\n\n## جمع‌بندی\n'+summary.join('  \n');const url=URL.createObjectURL(new Blob([markdown],{type:'text/markdown;charset=utf-8'}));function highlight(l){if(l.trim().startsWith('//'))return `<u>${l}</u>`;return l.replaceAll('&','&amp;').replaceAll('<','&lt;').replace(/("[^"]*"|\b(?:using|public|static|class|void|int|bool|const|return|if|private|string|true|false|event)\b|\b\d+\b|\b[A-Z]\w*)/g,x=>`<span class="${/^\d|^"/.test(x)?'gold':/^[A-Z]/.test(x)?'blue':'purple'}">${x}</span>`)}function render(){const d=data[idx];list.innerHTML=data.map((a,i)=>`<button class="item ${i===idx?'sel':''}" data-i="${i}"><i>${a[2]}</i><div>${a[0]}<small>${a[1]}</small></div><sup>${num(i)}</sup></button>`).join('');progress.innerHTML=`سناریوی ${fa(idx+1)} از ۵ <div class="bars">${data.map((_,i)=>`<b class="${i<=idx?'lit':''}"></b>`).join('')}</div>`;review.innerHTML=`<label>SCENARIO &nbsp; / &nbsp; ${num(idx)}</label><h2>${d[0]}</h2><p>${d[4]} در یک شوتر چندنفره‌ی سبک.</p>`+[false,true].map(g=>`<section class="panel ${g?'good':''}"><div class="pt"><b>${g?'✓ &nbsp; نسخه‌ی درست':'⚠ &nbsp; کد ضعیف'}</b><small>${g?'REFACTORED':'ANTI-PATTERN'}</small></div><div class="file"><span><strong>C#</strong> &nbsp; ${d[3]}.cs</span><button data-copy="${+g}" title="کپی کد">▢ &nbsp; کپی</button></div><pre>${code(d,g).split('\n').map((l,i)=>`<div><s>${i+1}</s>${highlight(l)}</div>`).join('')}</pre></section>${g?'':`<h3>بررسی ضعف‌ها</h3><ol>${d[7].map(s=>`<li>${s}</li>`).join('')}</ol>`}`).join('')+`<button class="next" id="next">${idx<4?'سناریوی بعدی ←':'مشاهده‌ی جمع‌بندی ←'}</button>`;document.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{idx=+b.dataset.i;render()});document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(code(d,!!+b.dataset.copy));b.textContent='کپی شد ✓'}catch{b.textContent='کد را انتخاب کنید'}});next.onclick=()=>{if(idx<4){idx++;render()}else show();review.scrollIntoView()}}function show(){document.querySelectorAll('.sel').forEach(e=>e.classList.remove('sel'));review.innerHTML=`<label>LAB SUMMARY</label><h2>جمع‌بندی آزمایشگاه</h2><ol>${summary.map(s=>`<li>${s}</li>`).join('')}</ol><a class="next" download="unity-lab.md" href="${url}">دریافت هر ۵ سناریو · Markdown ↓</a>`}sum.onclick=show;document.querySelector('a[href="#lab"]').onclick=render;render();
