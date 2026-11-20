@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07141d">
+<title>افق | میدان تمرین آرکید</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap');
+:root{--bg:#07141d;--panel:#0c1d27;--panel2:#102631;--line:#1b3945;--text:#e5f0eb;--muted:#82999a;--mint:#9be0bb;--orange:#ffb454;--cyan:#7dc9d3}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -5%,#18333b 0,#0a1a23 43%,#07141d 80%);color:var(--text);font-family:'Vazirmatn',Tahoma,sans-serif;min-height:100vh}button{font:inherit;color:inherit;cursor:pointer}.shell{width:min(1440px,100%);margin:auto;padding:27px 30px 34px}.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:23px}.brand{display:flex;gap:13px;align-items:center}.brandmark{height:42px;width:42px;border:1px solid #53776f;border-radius:13px;display:grid;place-items:center;color:var(--mint);background:#15302d;font-size:23px}.brand h1{font-size:20px;margin:0;font-weight:800;letter-spacing:-.4px}.brand p{margin:1px 0 0;color:var(--muted);font-size:11px}.top-right{display:flex;gap:10px;align-items:center}.badge{font-size:11px;color:#adc3bd;border:1px solid var(--line);border-radius:99px;padding:7px 12px;background:#0a1b24}.badge span{color:var(--mint)}.layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px;direction:ltr}.maincol,.sidebar{direction:rtl;min-width:0}.stage{position:relative;overflow:hidden;border:1px solid #28444b;border-radius:16px;background:#10232b;box-shadow:0 18px 55px #0005}.canvas-wrap{height:clamp(360px,51vw,610px);max-height:610px;position:relative}canvas{width:100%;height:100%;display:block}.stage-top{position:absolute;top:16px;right:17px;left:17px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none}.stage-tag{display:flex;align-items:center;gap:8px;font-size:11px;color:#e2eee6;background:#10242bbb;border:1px solid #c4e3d129;border-radius:7px;padding:7px 10px;backdrop-filter:blur(7px)}.dot{height:7px;width:7px;background:#9be0bb;border-radius:50%;box-shadow:0 0 11px #9be0bb}.stage-corner{font-size:10px;color:#d4e2d7a8;text-align:left;direction:ltr;letter-spacing:1.5px;line-height:1.8}.stage-bottom{position:absolute;bottom:14px;right:17px;left:17px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}.mission-label{font-size:11px;color:#d6e5da;background:#0b1a20b8;border:1px solid #ffffff17;border-radius:8px;padding:8px 11px;backdrop-filter:blur(6px)}.mission-label small{display:block;color:#8fa9a4;font-size:9px;margin-top:1px}.help-label{font-size:10px;color:#d2ded7;background:#0b1a20b8;border-radius:8px;padding:7px 10px;direction:rtl}.below{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:13px}.info-card,.panel{border:1px solid var(--line);border-radius:13px;background:linear-gradient(145deg,#0e2029,#0b1b24);padding:15px 16px}.info-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.info-head h2,.panel h2{font-size:13px;margin:0;font-weight:700}.micro{font-size:10px;color:var(--muted)}.equipment-line{display:flex;align-items:center;gap:10px}.equip-icon{width:35px;height:35px;border-radius:10px;display:grid;place-items:center;color:var(--mint);background:#18312d;font-size:18px}.equipment-line b{font-size:12px;display:block}.equipment-line small{font-size:10px;color:var(--muted)}.equipment-line .status{margin-right:auto;color:var(--mint);font-size:10px}.meter{height:3px;background:#1d363c;border-radius:9px;margin-top:12px;overflow:hidden}.meter i{height:100%;display:block;width:61%;background:linear-gradient(90deg,#7dc9d3,#9be0bb);border-radius:9px}.sidebar{display:flex;flex-direction:column;gap:13px}.panel{padding:17px}.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.tiny-icon{color:var(--mint);font-size:16px}.equip-list{display:flex;flex-direction:column;gap:7px}.equip-option{width:100%;border:1px solid transparent;background:#0b1921;border-radius:10px;display:flex;align-items:center;gap:10px;text-align:right;padding:10px 11px;transition:.2s}.equip-option:hover{border-color:#42695c;background:#102620}.equip-option.active{border-color:#63977c;background:linear-gradient(105deg,#17332c,#10231f);box-shadow:inset -2px 0 0 var(--mint)}.equip-symbol{width:32px;height:32px;background:#142a31;border-radius:9px;display:grid;place-items:center;font-size:17px;color:#9ed8c1;flex:none}.equip-copy{min-width:0}.equip-copy b{display:block;font-size:11px;font-weight:700}.equip-copy small{color:#83999a;font-size:9px;display:block;margin-top:2px}.equip-option .check{margin-right:auto;color:var(--mint);font-size:14px;opacity:0}.equip-option.active .check{opacity:1}.notice{font-size:9px;line-height:1.8;color:#809595;margin:12px 1px 0}.launch{border:0;background:linear-gradient(115deg,#afe7c1,#7fc6ac);color:#0c211d;font-size:13px;font-weight:800;border-radius:10px;width:100%;padding:12px 14px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 6px 22px #8dd6ae22;transition:.2s}.launch:hover{filter:brightness(1.07);transform:translateY(-1px)}.launch:disabled{opacity:.6;cursor:default;transform:none}.launch .arrow{font-size:17px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{border:1px solid #1b353d;background:#0a1a22;border-radius:9px;padding:10px}.stat small{font-size:9px;color:var(--muted);display:block;margin-bottom:3px}.stat b{font-family:monospace;font-size:17px;letter-spacing:.5px;color:#e3f1e9}.stat b em{font-style:normal;font-size:10px;color:#9bb1a9;font-family:'Vazirmatn',sans-serif}.history{padding-top:13px}.history-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #193039;font-size:10px;color:#a4b7af}.history-row:last-child{border:0;padding-bottom:1px}.history-row strong{font-size:10px;color:#cde0d6;font-weight:600}.history-row .good{color:var(--mint)}.footer{display:flex;justify-content:space-between;align-items:center;color:#667c80;font-size:10px;margin-top:18px;padding:0 3px}.footer .keys{display:flex;gap:8px;align-items:center}.key{font:10px monospace;color:#b9cbc3;background:#10242c;border:1px solid #29434a;border-radius:4px;padding:2px 6px}.toast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.94);background:#0c201ee8;border:1px solid #7ab79466;border-radius:12px;padding:15px 22px;text-align:center;opacity:0;transition:.25s;pointer-events:none;white-space:nowrap;backdrop-filter:blur(8px)}.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}.toast b{display:block;font-size:15px;color:var(--mint)}.toast small{color:#b1c5bb;font-size:10px}.reticle{position:absolute;pointer-events:none;left:75%;top:57%;width:30px;height:30px;border:1px solid #b6d5bf9c;border-radius:50%;transform:translate(-50%,-50%);transition:left .13s,top .13s}.reticle:before,.reticle:after{content:'';position:absolute;background:#b6d5bf9c}.reticle:before{width:44px;height:1px;left:-8px;top:14px}.reticle:after{height:44px;width:1px;left:14px;top:-8px}.reticle i{position:absolute;width:3px;height:3px;background:#c3e4c9;border-radius:50%;left:12px;top:12px}.scanline{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,#0310180a 4px);opacity:.3}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{display:grid;grid-template-columns:1fr 1fr;align-items:start}.sidebar .panel:first-child{grid-row:span 2}.canvas-wrap{height:55vw;min-height:350px}.shell{padding:20px}}
+@media(max-width:580px){.shell{padding:15px 12px}.topbar{margin-bottom:15px}.brand h1{font-size:17px}.top-right .badge:first-child{display:none}.layout{gap:12px}.canvas-wrap{height:70vw;min-height:320px}.sidebar{display:flex}.below{grid-template-columns:1fr}.footer{font-size:9px}.help-label{max-width:55%;line-height:1.8}.stage-corner{font-size:8px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand"><div class="brandmark">⌁</div><div><h1>افق <span style="color:var(--mint)">/</span> میدان تمرین</h1><p>شبیه‌ساز آرکید سه‌بعدی · نسخه آزمایشی</p></div></div>
+    <div class="top-right"><div class="badge">وضعیت میدان: <span>آماده</span></div><div class="badge">● &nbsp;حالت تمرینی</div></div>
+  </header>
+  <main class="layout">
+    <section class="maincol">
+      <div class="stage">
+        <div class="canvas-wrap"><canvas id="scene" aria-label="نمای سه بعدی میدان تمرین"></canvas><div class="scanline"></div><div class="reticle" id="reticle"><i></i></div>
+          <div class="stage-top"><div class="stage-tag"><i class="dot"></i><span id="stageStatus">میدان فعال</span></div><div class="stage-corner">SIMULATION&nbsp; / &nbsp;01<br>35° 42′ N &nbsp; 51° 25′ E</div></div>
+          <div class="stage-bottom"><div class="mission-label">ماموریت ۰۱<small>تمرین نشانه‌گیری · محیط غیرواقعی</small></div><div class="help-label">نشانگر را با ماوس جابه‌جا کنید</div></div>
+          <div class="toast" id="toast"><b id="toastTitle">اصابت تمرینی!</b><small id="toastText">امتیاز ثبت شد</small></div>
+        </div>
+      </div>
+      <div class="below">
+        <div class="info-card"><div class="info-head"><h2>سامانه انتخاب‌شده</h2><span class="micro">پیکربندی نمایشی</span></div><div class="equipment-line"><div class="equip-icon">➤</div><div><b id="selectedName">آذرخش</b><small id="selectedType">کلاس سرعتی · آرکید</small></div><span class="status">آماده</span></div><div class="meter"><i id="powerMeter"></i></div></div>
+        <div class="info-card"><div class="info-head"><h2>وضعیت میدان</h2><span class="micro">لحظه‌ای</span></div><div class="equipment-line"><div class="equip-icon" style="color:var(--orange);background:#352b1e">◉</div><div><b>هدف تمرینی دریایی</b><small>ناو هواپیمابر آبراهام لینکلن · مدل آرکید</small></div><span class="status" style="color:var(--orange)">ردیابی</span></div></div>
+      </div>
+    </section>
+    <aside class="sidebar">
+      <section class="panel"><div class="panel-head"><h2>انتخاب تجهیزات</h2><span class="tiny-icon">⌘</span></div><div class="equip-list" id="equipList"></div><p class="notice">نام‌ها صرفاً الهام‌گرفته از نام‌گذاری‌های شناخته‌شده‌اند؛ ویژگی‌ها، برد و عملکرد در این بازی ساختگی و غیرواقعی هستند.</p></section>
+      <section class="panel"><div class="panel-head"><h2>کنترل ماموریت</h2><span class="micro">دور <span id="round">۰۱</span></span></div><button class="launch" id="launch"><span class="arrow">↗</span><span>شروع تمرین</span></button><p class="notice" style="margin-bottom:0">برای شلیک دکمه را بزنید یا کلید فاصله را فشار دهید. با کلیدهای جهت‌دار مسیر را هدایت کنید.</p></section>
+      <section class="panel"><div class="panel-head"><h2>کارنامه</h2><span class="micro">امروز</span></div><div class="stats"><div class="stat"><small>امتیاز</small><b id="score">0000</b></div><div class="stat"><small>تمرین‌ها</small><b id="shots">00</b></div></div><div class="history"><div class="history-row"><span>آخرین نتیجه</span><strong id="lastResult">—</strong></div><div class="history-row"><span>دقت بازی</span><strong class="good" id="accuracy">—</strong></div></div></section>
+    </aside>
+  </main>
+  <footer class="footer"><span>افق · تجربه آرکید تعاملی</span><div class="keys"><span>حرکت</span><kbd class="key">←</kbd><kbd class="key">↑</kbd><kbd class="key">↓</kbd><kbd class="key">→</kbd><span style="margin-right:5px">شلیک</span><kbd class="key">Space</kbd></div></footer>
+</div>
+<script>
+(()=>{
+const canvas=document.getElementById('scene'),ctx=canvas.getContext('2d'),wrap=canvas.parentElement;
+const entries=[
+ {name:'آذرخش',sub:'کلاس سرعتی · آرکید',icon:'➤',power:66,color:'#a6e2c2'},
+ {name:'ذوالفقار',sub:'کلاس متوازن · آرکید',icon:'◢',power:78,color:'#ffce83'},
+ {name:'خلیج فارس',sub:'کلاس سنگین · آرکید',icon:'⌁',power:92,color:'#83d5db'},
+ {name:'سومار',sub:'کلاس مانوری · آرکید',icon:'➶',power:73,color:'#c3b3ef'},
+ {name:'فجر',sub:'کلاس چندمرحله‌ای · آرکید',icon:'✧',power:84,color:'#ff9c83'}
+];
+let selected=0, shots=0,hits=0,score=0,round=1,rocket=null,bursts=[],last=performance.now(),time=0,aim={x:.75,y:.57},keys={}, stars=[];
+for(let i=0;i<42;i++)stars.push({x:Math.random(),y:Math.random()*.44,r:Math.random()*1.3+.3,a:Math.random()*.3+.08});
+const list=document.getElementById('equipList');
+entries.forEach((e,i)=>{const b=document.createElement('button');b.className='equip-option'+(i===0?' active':'');b.innerHTML=`<span class="equip-symbol">${e.icon}</span><span class="equip-copy"><b>${e.name}</b><small>${e.sub}</small></span><span class="check">✓</span>`;b.onclick=()=>select(i);list.appendChild(b)});
+function select(i){selected=i;document.querySelectorAll('.equip-option').forEach((el,j)=>el.classList.toggle('active',i===j));document.getElementById('selectedName').textContent=entries[i].name;document.getElementById('selectedType').textContent=entries[i].sub;document.getElementById('powerMeter').style.width=entries[i].power+'%';document.getElementById('powerMeter').style.background=entries[i].color;}
+function resize(){let dpr=Math.min(devicePixelRatio||1,2),r=wrap.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}new ResizeObserver(resize).observe(wrap);resize();
+function poly(points,fill,stroke){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}}
+function line(x1,y1,x2,y2,color,w=1){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=w;ctx.stroke()}
+function drawCarrier(w,h){let x=w*.73,y=h*.57,s=Math.min(w,h)*.37; // stylized, purely fictional silhouette
+// wake
+ctx.fillStyle='#b9d4d42a';ctx.beginPath();ctx.moveTo(x-s*.72,y+s*.22);ctx.lineTo(x-s*1.55,y+s*.72);ctx.lineTo(x-s*.18,y+s*.4);ctx.lineTo(x+s*.45,y+s*.53);ctx.lineTo(x+s*.93,y+s*.16);ctx.closePath();ctx.fill();
+// hull body
+poly([[x-s*.78,y+s*.04],[x+s*.9,y+s*.01],[x+s*.72,y+s*.37],[x+s*.42,y+s*.48],[x-s*.64,y+s*.31]],'#283b40','#98b1a044');
+poly([[x-s*.66,y+s*.04],[x+s*.91,y+s*.01],[x+s*.63,y+s*.18],[x-s*.57,y+s*.21]],'#50645e','#d3d0aa77');
+// flight deck
+poly([[x-s*.51,y-s*.13],[x+s*.97,y-s*.17],[x+s*.82,y+s*.035],[x-s*.66,y+s*.07]],'#89928a','#d7d6c188');
+// runway markings
+line(x-s*.37,y-s*.094,x+s*.73,y-s*.12,'#ece5c6aa',1);line(x-s*.52,y-s*.02,x+s*.53,y-s*.005,'#384c48aa',1);
+// island
+poly([[x+s*.12,y-s*.27],[x+s*.4,y-s*.29],[x+s*.39,y-s*.06],[x+s*.14,y-s*.04]],'#65746e','#bec8b855');
+poly([[x+s*.19,y-s*.39],[x+s*.34,y-s*.4],[x+s*.36,y-s*.28],[x+s*.18,y-s*.27]],'#7c8981','#d0d4c488');
+line(x+s*.27,y-s*.47,x+s*.27,y-s*.38,'#bbc8bc',2);line(x+s*.22,y-s*.42,x+s*.33,y-s*.42,'#bbc8bc',1);
+// deck planes as tiny silhouettes
+for(let i=0;i<4;i++){let px=x-s*.36+i*s*.28,py=y-s*.12-i*s*.008;line(px,py,px+s*.09,py-s*.013,'#313d3a',2);line(px+s*.04,py-s*.006,px+s*.055,py-s*.027,'#313d3a',1)}
+// target ring
+if(!rocket){ctx.beginPath();ctx.ellipse(x+s*.15,y+s*.1,s*.98,s*.36,0,0,Math.PI*2);ctx.strokeStyle='#9fe1bd48';ctx.setLineDash([4,6]);ctx.stroke();ctx.setLineDash([])}
+}
+function drawScene(now){let w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;time=now/1000;ctx.clearRect(0,0,w,h);
+let sky=ctx.createLinearGradient(0,0,0,h*.63);sky.addColorStop(0,'#152b37');sky.addColorStop(.62,'#59706c');sky.addColorStop(1,'#c28a62');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h*.63);
+// stars / glints
+stars.forEach(s=>{ctx.globalAlpha=s.a*(.75+.25*Math.sin(time+s.x*9));ctx.fillStyle='#f0e2c4';ctx.beginPath();ctx.arc(s.x*w,s.y*h,s.r,0,7);ctx.fill()});ctx.globalAlpha=1;
+// distant haze
+let haze=ctx.createLinearGradient(0,h*.43,0,h*.72);haze.addColorStop(0,'#d4a27800');haze.addColorStop(.58,'#d1a27b50');haze.addColorStop(1,'#8db0a200');ctx.fillStyle=haze;ctx.fillRect(0,h*.4,w,h*.3);
+// ocean
+let sea=ctx.createLinearGradient(0,h*.58,0,h);sea.addColorStop(0,'#2a5554');sea.addColorStop(.26,'#174047');sea.addColorStop(1,'#0b242f');ctx.fillStyle=sea;ctx.fillRect(0,h*.58,w,h*.42);
+// horizon
+line(0,h*.59,w,h*.59,'#e3c6a548',1);
+// waves perspective strokes
+for(let i=0;i<35;i++){let y=h*.61+(i/35)**1.6*h*.36;let len=12+(i/35)*65;let x=((i*137+time*(8+i%4)*4)%(w+len))-len;ctx.globalAlpha=.06+(i/35)*.09;line(x,y,x+len,y+(i%3)*.5,'#b0d5c9',.7)}ctx.globalAlpha=1;
+// far cloud forms
+for(let i=0;i<4;i++){let x=w*(.12+i*.24)+Math.sin(time*.07+i)*5,y=h*(.29+(i%2)*.07),r=w*.07;ctx.fillStyle='#e5c4a30a';ctx.beginPath();ctx.ellipse(x,y,r,r*.12,0,0,7);ctx.fill()}
+drawCarrier(w,h);
+// foreground console / launcher silhouette
+poly([[0,h*.86],[w*.17,h*.77],[w*.36,h*.83],[w*.46,h],[0,h]],'#102329');poly([[0,h*.86],[w*.17,h*.77],[w*.36,h*.83]],'#34504c');
+// simple launcher rails
+line(w*.07,h*.9,w*.31,h*.82,'#81918555',2);line(w*.09,h*.94,w*.32,h*.86,'#81918533',1);
+// ambient vignette
+let vg=ctx.createRadialGradient(w*.53,h*.47,h*.17,w*.53,h*.47,w*.78);vg.addColorStop(.55,'#03101700');vg.addColorStop(1,'#03101794');ctx.fillStyle=vg;ctx.fillRect(0,0,w,h);
+// shot
+if(rocket){rocket.t+=.0085;let t=Math.min(rocket.t,1),ease=t*t*(3-2*t),tx=w*(.73+(aim.x-.75)*.34),ty=h*(.59+(aim.y-.57)*.3),sx=w*.22,sy=h*.84;let cx=sx+(tx-sx)*ease,cy=sy+(ty-sy)*ease-Math.sin(Math.PI*ease)*h*.1;rocket.x=cx;rocket.y=cy;
+// trail
+for(let j=0;j<13;j++){let f=j/13,px=cx-(tx-sx)*.07*f,py=cy-(ty-sy)*.07*f+f*h*.035;ctx.globalAlpha=(1-f)*.38;ctx.fillStyle=j%2?'#ffb85d':'#fff0b4';ctx.beginPath();ctx.arc(px,py,(1-f)*5+1,0,7);ctx.fill()}ctx.globalAlpha=1;
+ctx.save();ctx.translate(cx,cy);ctx.rotate(Math.atan2(ty-sy,tx-sx));ctx.fillStyle=entries[selected].color;ctx.beginPath();ctx.moveTo(11,0);ctx.lineTo(-8,-3.4);ctx.lineTo(-5,0);ctx.lineTo(-8,3.4);ctx.closePath();ctx.fill();ctx.restore();
+if(t>=1){bursts.push({x:tx,y:ty,r:2,a:1});rocket=null;hits++;score+=100+entries[selected].power;document.getElementById('lastResult').textContent='اصابت تمرینی';document.getElementById('lastResult').className='good';document.getElementById('stageStatus').textContent='ثبت نتیجه';toast('اصابت تمرینی!',`+${100+entries[selected].power} امتیاز · بدون خسارت واقعی`);updateStats();setTimeout(()=>document.getElementById('stageStatus').textContent='میدان فعال',1900)}
+}
+bursts=bursts.filter(b=>b.a>.02);bursts.forEach(b=>{b.r+=1.8;b.a*=.94;ctx.globalAlpha=b.a;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,7);ctx.strokeStyle='#ffce83';ctx.lineWidth=2;ctx.stroke();ctx.beginPath();ctx.arc(b.x,b.y,b.r*.42,0,7);ctx.strokeStyle='#fff1c4';ctx.lineWidth=1.3;ctx.stroke()});ctx.globalAlpha=1;
+requestAnimationFrame(drawScene)}requestAnimationFrame(drawScene);
+function toast(title,text){document.getElementById('toastTitle').textContent=title;document.getElementById('toastText').textContent=text;let t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2100)}
+function updateStats(){document.getElementById('score').textContent=String(score).padStart(4,'0');document.getElementById('shots').textContent=String(shots).padStart(2,'0');document.getElementById('accuracy').textContent=shots?Math.round(hits/shots*100)+'٪':'—';document.getElementById('round').textContent=String(round).padStart(2,'0')}
+function launch(){if(rocket)return;shots++;round++;rocket={t:0,x:0,y:0};document.getElementById('stageStatus').textContent='تمرین در جریان';document.getElementById('lastResult').textContent='در حال اجرا';document.getElementById('lastResult').className='';document.getElementById('launch').disabled=true;document.querySelector('#launch span:nth-child(2)').textContent='در حال تمرین…';updateStats();setTimeout(()=>{document.getElementById('launch').disabled=false;document.querySelector('#launch span:nth-child(2)').textContent='شروع تمرین'},1250)}
+document.getElementById('launch').onclick=launch;
+wrap.addEventListener('pointermove',e=>{let r=wrap.getBoundingClientRect();aim.x=Math.max(.58,Math.min(.9,(e.clientX-r.left)/r.width));aim.y=Math.max(.39,Math.min(.72,(e.clientY-r.top)/r.height));let ret=document.getElementById('reticle');ret.style.left=(aim.x*100)+'%';ret.style.top=(aim.y*100)+'%'});
+window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys[e.key]=true;if(e.code==='Space')launch();let step=.025;if(e.key==='ArrowLeft'||e.key==='a')aim.x=Math.max(.58,aim.x-step);if(e.key==='ArrowRight'||e.key==='d')aim.x=Math.min(.9,aim.x+step);if(e.key==='ArrowUp'||e.key==='w')aim.y=Math.max(.39,aim.y-step);if(e.key==='ArrowDown'||e.key==='s')aim.y=Math.min(.72,aim.y+step);document.getElementById('reticle').style.left=aim.x*100+'%';document.getElementById('reticle').style.top=aim.y*100+'%'});
+})();
+</script>
+</body></html>
