@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-persian: 'Vazirmatn', system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #020617;
+  color: #e2e8f0;
+  font-family: var(--font-persian);
+}
+
+.font-mono-tech {
+  font-family: var(--font-mono);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* Optics camera filters */
+.optics-normal {
+  filter: none;
+}
+
+.optics-nvg {
+  filter: sepia(100%) hue-rotate(78deg) saturate(290%) brightness(1.08) contrast(1.25);
+}
+
+.optics-flir {
+  filter: grayscale(100%) contrast(1.75) brightness(1.05) invert(8%);
+}
+
+/* Subtle tactical scanlines for NVG / FLIR */
+.scanlines-overlay {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.22) 3px,
+    rgba(0, 0, 0, 0.22) 4px
+  );
+  pointer-events: none;
+}
+
+.nvg-vignette {
+  background: radial-gradient(circle, transparent 48%, rgba(0, 22, 6, 0.72) 100%);
+  pointer-events: none;
+}
+
+.flir-vignette {
+  background: radial-gradient(circle, transparent 55%, rgba(0, 0, 0, 0.65) 100%);
+  pointer-events: none;
+}
+
+/* Military glass panel */
+.tac-panel {
+  background: linear-gradient(180deg, rgba(8, 15, 30, 0.86) 0%, rgba(5, 10, 22, 0.92) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(148, 163, 184, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.tac-panel-amber {
+  background: linear-gradient(180deg, rgba(16, 14, 10, 0.88) 0%, rgba(9, 10, 18, 0.94) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(251, 191, 36, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+/* Custom sleek scrollbar */
+.tac-scroll::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.tac-scroll::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 999px;
+}
+
+.tac-scroll::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.35);
+  border-radius: 999px;
+}
+
+.tac-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.6);
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: rgba(239, 68, 68, 0.45);
+  }
+  50% {
+    border-color: rgba(239, 68, 68, 0.95);
+  }
+}
+
+.animate-alert-border {
+  animation: pulse-border 1s ease-in-out infinite;
+}
