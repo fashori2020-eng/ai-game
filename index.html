@@ -1,1 +1,79 @@
-<!doctype html><html lang="fa"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>عملیات افق</title><link rel="stylesheet" href="/style.css"><body><main><div id="view"></div><header><div class="brand"><b>⬡</b><div>عملیات افق<small>HORIZON / ARCADE COMMAND</small></div></div><div class="live"><i></i> سامانه آنلاین</div></header><aside dir="rtl"><small>۰۱ / میدان تمرین</small><h1>عملیات افق<span>.</span></h1><p>ناو خیالی سپهر در میدان تمرین اقیانوس. اهداف نورانی را نشانه بگیرید و امتیاز کسب کنید.</p><hr><div class="label">انتخاب پرتابه <span>01 — 03</span></div><div id="choices"></div><button id="fire">پرتاب <span>SPACE ↵</span></button></aside><div class="mission"><small>LIVE SIMULATION / 01</small><b>میدان تمرین سپهر</b></div><div id="toast" role="status"></div><footer><div><small>SCORE</small><b id="score">000</b></div><div><small>HITS</small><b id="hits">00</b></div><div><small>SHOTS</small><b id="shots">00</b></div><button id="reset" title="بازنشانی" aria-label="بازنشانی">⟳</button><p dir="rtl">روی نشان‌های نورانی کلیک کنید یا با کلیدهای ← → هدف را عوض کنید.</p></footer></main><script type="module" src="/src.js"></script></body></html>
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>آزمایشگاه کد ضعیف | شوتر چندنفره C#</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="overlay"></div>
+
+<div class="page">
+<header id="topbar">
+  <a class="brand" href="#top"><b>⬡</b><span>آزمایشگاه کد ضعیف<small>WEAK CODE LAB</small></span></a>
+  <nav>
+    <a href="#scenarios">سناریوها</a>
+    <a href="#summary">جمع‌بندی</a>
+  </nav>
+  <div class="live"><i></i> C# / UNITY</div>
+  <div id="progress"></div>
+</header>
+
+<section class="hero" id="top">
+  <div class="crosshair" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
+  <div class="hero-inner">
+    <div class="badge">آموزش معماری کد — شوتر چندنفره‌ی سبک</div>
+    <h1>کد ضعیف در<br><span>بازی‌سازی</span></h1>
+    <p class="lead">پنج سناریوی واقعی از یک شوتر چندنفره‌ی سبک با C# و Unity. هر سناریو یک کد ضعیفِ قابل اجرا دارد، بعد فهرست ضعف‌هایش و در پایان یک «نسخه‌ی درست» کوتاه. هدف: دیدن الگوهای نادرست، نه حفظ کردن آن‌ها.</p>
+    <div class="stats">
+      <div><b>۵</b><small>سناریو</small></div>
+      <div><b>۳۰</b><small>ضعف رایج</small></div>
+      <div><b>۵</b><small>نسخه‌ی درست</small></div>
+      <div><b dir="ltr">C#</b><small>Unity</small></div>
+    </div>
+    <a class="cta" href="#scenarios">شروع مأموریت <span>↓</span></a>
+  </div>
+  <div class="hero-foot" dir="ltr">SCROLL TO INSPECT THE CODE</div>
+</section>
+
+<section class="index-sec" id="scenarios">
+  <div class="sec-head reveal">
+    <small dir="ltr">SCENARIO INDEX / 05</small>
+    <h2>فهرست سناریوها</h2>
+    <p>پنج دامنه‌ی متفاوت از یک پروژه‌ی شوتر؛ هرکدام یک کلاس واقعی و یک درس مشخص.</p>
+  </div>
+  <div class="index-grid" id="index-grid"></div>
+</section>
+
+<main id="scenario-list"></main>
+
+<section class="summary" id="summary">
+  <div class="sec-head reveal">
+    <small dir="ltr">SUMMARY / 05 LINES</small>
+    <h2>جمع‌بندی</h2>
+    <p>پرتکرارترین ضعف‌ها در هر پنج نمونه:</p>
+  </div>
+  <ol class="summary-list reveal">
+    <li><span class="n">۱</span><span>نام‌های مبهم و magic numberها در هر ۵ نمونه تکرار شده‌اند؛ خوانایی را از بین می‌برند.</span></li>
+    <li><span class="n">۲</span><span>state سراسری (static/public) رایج‌ترین ضعف معماری در این نمونه‌هاست.</span></li>
+    <li><span class="n">۳</span><span>نبود اعتبارسنجی ورودی در همه‌ی نمونه‌ها دیده می‌شود؛ از بازیکن تا شبکه.</span></li>
+    <li><span class="n">۴</span><span>تکرار کد و کپی‌پیست، هزینه‌ی نگهداری و ریسک باگ را بالا می‌برد.</span></li>
+    <li><span class="n">۵</span><span>نبود رویداد و مدیریت خطا، سیستم‌ها را به هم قفل و تست را سخت می‌کند.</span></li>
+  </ol>
+</section>
+
+<footer>
+  <p>آزمایشگاه کد ضعیف — پروژه‌ای آموزشی و عمومی؛ وابسته به هیچ بازی یا ناشر واقعی نیست.</p>
+  <small dir="ltr">C# / UNITY — WEAK CODE LAB</small>
+  <a href="#top" class="to-top">بازگشت به بالا ↑</a>
+</footer>
+</div>
+
+<script type="module" src="/src.js"></script>
+</body>
+</html>
