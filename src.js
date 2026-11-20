@@ -1,26 +1,324 @@
-import * as T from 'three';
-const el=id=>document.getElementById(id), view=el('view');
-const scene=new T.Scene();scene.background=new T.Color(0x6994a8);scene.fog=new T.FogExp2(0x779bac,.009);
-const camera=new T.PerspectiveCamera(43,1,.1,350), renderer=new T.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(1,1);view.append(renderer.domElement);renderer.toneMapping=T.ACESFilmicToneMapping;
-scene.add(new T.HemisphereLight(0xd8f5ff,0x496477,2.1));const sun=new T.DirectionalLight(0xffe4bc,2.4);sun.position.set(-25,30,-10);scene.add(sun);
-const sea=new T.PlaneGeometry(350,350,110,110);sea.rotateX(-Math.PI/2);const seaMat=new T.MeshPhongMaterial({color:0x246b85,shininess:55,vertexColors:true});const colors=[];for(let i=0;i<sea.attributes.position.count;i++){const c=new T.Color().setHSL(.55,.43,.36+Math.random()*.10);colors.push(c.r,c.g,c.b)}sea.setAttribute('color',new T.Float32BufferAttribute(colors,3));seaMat.color.set(0x67b8cd);const water=new T.Mesh(sea,seaMat);water.position.y=-.45;scene.add(water);
-const ship=new T.Group();scene.add(ship);
-function box(parent,w,h,d,x,y,z,color){const m=new T.Mesh(new T.BoxGeometry(w,h,d),new T.MeshStandardMaterial({color,roughness:.75}));m.position.set(x,y,z);parent.add(m);return m}
-function hull(points,y,depth,color){const s=new T.Shape();points.forEach(([x,z],i)=>i?s.lineTo(x,-z):s.moveTo(x,-z));s.closePath();const g=new T.ExtrudeGeometry(s,{depth,bevelEnabled:false});g.rotateX(-Math.PI/2);const m=new T.Mesh(g,new T.MeshStandardMaterial({color}));m.position.y=y;ship.add(m)}
-const outline=[[-20,-4.7],[-13,-6.5],[13,-6.5],[20,-3],[21,0],[17,5.7],[-20,6.5]];hull(outline.map(([x,z])=>[x*.97,z*.83]),-1,2.4,0x263b49);hull(outline,1.4,.38,0x556471);
-box(ship,36,.025,.13,-1,1.79,-.8,0xe1ded0).rotation.y=.09;box(ship,34,.025,.08,-2,1.79,4.6,0xf7c672);for(let i=0;i<17;i++)box(ship,.85,.028,.11,i*2-17,1.79,1.2,0xf2e8cf);for(let i=0;i<6;i++)box(ship,.12,.03,2.1,-18+i*.55,1.8,-2.5,0xedeee0);
-for(const [w,h,d,x,y,z] of [[7,1.5,2.8,4,2.5,-4.5],[5,1.1,2.4,5,3.8,-4.5],[3,.9,2,5.7,4.8,-4.5],[.23,3,.23,5.7,6.6,-4.5],[2.8,.15,.5,5.7,7.4,-4.5]])box(ship,w,h,d,x,y,z,0x879da7);for(let i=0;i<8;i++)box(ship,.37,.25,.04,3.2+i*.46,4,-3.28,0x122c3c);
-for(const [x,z] of [[-15,3.3],[-11,3.3],[14,-3.2]]){const g=new T.Group();ship.add(g);g.position.set(x,1.92,z);box(g,3,.20,.46,0,0,0,0x7692a1);box(g,1.45,.09,1.7,-.2,0,0,0x92abb6);box(g,.55,.10,.92,-1.15,.1,0,0x839ca9);box(g,.6,.2,.27,.4,.11,0,0x263b49)}
-const text=document.createElement('canvas');text.width=256;text.height=96;const ctx=text.getContext('2d');ctx.fillStyle='#dde5e4';ctx.font='bold 73px monospace';ctx.fillText('07',20,73);const decal=new T.Mesh(new T.PlaneGeometry(6,2.25),new T.MeshBasicMaterial({map:new T.CanvasTexture(text),transparent:true,depthWrite:false}));decal.rotation.x=-Math.PI/2;decal.position.set(15,1.795,2.4);ship.add(decal);
-const targets=[[-11,7,-2],[1,10,3],[14,7,-1]].map((p,i)=>{const node=new T.Group();node.position.set(...p);scene.add(node);const ring=new T.Mesh(new T.TorusGeometry(.65,.045,8,32),new T.MeshBasicMaterial({color:0x6affdb}));node.add(ring);const core=new T.Mesh(new T.OctahedronGeometry(.36),new T.MeshBasicMaterial({color:0xafffea,wireframe:true}));node.add(core);const button=document.createElement('button');button.className='target';button.textContent=`0${i+1}`;button.setAttribute('aria-label',`انتخاب هدف ${i+1}`);button.onclick=()=>select(i);view.append(button);return{node,ring,core,button,base:p[1]}});
-const modes=[['شهاب','SH-01',0x69ffda,.72,100],['آذر','AZ-02',0xffc76b,.48,150],['سروش','SR-03',0xadabff,1.12,200]];let mode=0,selected=0,score=0,hits=0,shots=0,flight=null,flash=null;
-const choice=modes.map(([name,code],i)=>{const b=document.createElement('button');b.innerHTML=`${name}<span>${code}</span>`;b.onclick=()=>{mode=i;sync()};el('choices').append(b);return b});
-function sync(){choice.forEach((b,i)=>{b.classList.toggle('active',i===mode);b.setAttribute('aria-pressed',i===mode)});targets.forEach(({button,ring},i)=>{button.classList.toggle('active',i===selected);button.setAttribute('aria-pressed',i===selected);ring.material.color.setHex(i===selected?0xffce72:0x6affdb)});for(const [id,n,len] of [['score',score,3],['hits',hits,2],['shots',shots,2]])el(id).textContent=String(n).padStart(len,'0');el('fire').disabled=!!flight}
-function select(i){selected=i;sync()}
-function remove(m){scene.remove(m);m.geometry.dispose();m.material.dispose()}
-function fire(){if(flight)return;const [, ,color,duration,points]=modes[mode];const mesh=new T.Mesh(new T.SphereGeometry(.31,12,10),new T.MeshBasicMaterial({color}));const start=camera.position.clone().lerp(new T.Vector3(0,1,6),.35);mesh.position.copy(start);scene.add(mesh);flight={mesh,start,duration,points,color,index:selected,time:performance.now()};shots++;el('toast').textContent='پرتابه در مسیر است…';sync()}
-el('fire').onclick=fire;el('reset').onclick=()=>{if(flight)remove(flight.mesh);if(flash)remove(flash.mesh);flight=flash=null;score=hits=shots=mode=selected=0;el('toast').textContent='';sync()};window.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.tagName!=='BUTTON'){e.preventDefault();fire()}if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();select((selected+(e.key==='ArrowRight'?1:2))%3)}});
-function resize(){const w=view.clientWidth,h=view.clientHeight;camera.aspect=w/h;if(w<=720){camera.position.set(12,25,55);camera.lookAt(0,-8,0);camera.fov=w<440?63:52}else{camera.position.set(20,22,49);camera.lookAt(7,3,0);camera.fov=w<1050?51:43}camera.updateProjectionMatrix();renderer.setSize(w,h)}window.addEventListener('resize',resize);resize();sync();
-const projected=new T.Vector3();renderer.setAnimationLoop(ms=>{const t=ms*.001;const a=sea.attributes.position;for(let i=0;i<a.count;i++){const x=a.getX(i),z=a.getZ(i);a.setY(i,Math.sin(x*.51+z*.28+t*1.55)*.21+Math.sin(z*.72-t*1.2)*.13)}a.needsUpdate=true;sea.computeVertexNormals();ship.rotation.z=Math.sin(t*.65)*.009;
-for(const [i,{node,base,core,ring,button}] of targets.entries()){node.position.y=base+.45*Math.sin(t*1.4+i);ring.quaternion.copy(camera.quaternion);core.rotation.y=t+i;projected.copy(node.position).project(camera);button.style.left=`${(projected.x+1)*50}%`;button.style.top=`${(1-projected.y)*50}%`}
-if(flight){const f=flight,p=Math.min(1,(ms-f.time)/(f.duration*1000)),dest=targets[f.index].node.position;f.mesh.position.lerpVectors(f.start,dest,p);f.mesh.position.y+=Math.sin(Math.PI*p)*2.5;if(p>=1){if(flash)remove(flash.mesh);const mesh=new T.Mesh(new T.SphereGeometry(.65,12,10),new T.MeshBasicMaterial({color:f.color,transparent:true,wireframe:true}));mesh.position.copy(dest);scene.add(mesh);flash={mesh,time:ms};remove(f.mesh);score+=f.points;hits++;flight=null;el('toast').textContent=`اصابت موفق! +${f.points}`;select((f.index+1)%3)}}if(flash){const p=(ms-flash.time)/650;flash.mesh.scale.setScalar(1+p*4);flash.mesh.material.opacity=Math.max(0,1-p);if(p>=1){remove(flash.mesh);flash=null}}renderer.render(scene,camera)});
+// بازی ۲۰۴۸ — منطق بازی، انیمیشن و ورودی
+
+const SIZE = 4;          // صفحه ۴×۴
+const GAP = 12;          // فاصله بین خانه‌ها (پیکسل، هماهنگ با CSS)
+const WIN_VALUE = 2048;  // مقدار برد
+const MOVE_MS = 140;     // کمی بیشتر از مدت ترنزیشن CSS
+
+const boardEl = document.getElementById('board');
+const gridEl = document.getElementById('grid');
+const tilesEl = document.getElementById('tiles');
+const scoreEl = document.getElementById('score');
+const bestEl = document.getElementById('best');
+const undoBtn = document.getElementById('undo');
+const newGameBtn = document.getElementById('new-game');
+const overlayEl = document.getElementById('overlay');
+const overlayTitle = document.getElementById('overlay-title');
+const overlayText = document.getElementById('overlay-text');
+const keepGoingBtn = document.getElementById('keep-going');
+const overlayRestartBtn = document.getElementById('overlay-restart');
+
+// نمایش اعداد با ارقام فارسی
+const faDigits = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+
+// ذخیره‌سازی امن (در بعضی محیط‌ها localStorage در دسترس نیست)
+const storage = {
+  get(k){ try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v){ try { localStorage.setItem(k, v); } catch {} },
+};
+
+let grid;             // grid[row][col] = کاشی یا null — کاشی: {row, col, value, el}
+let score = 0;
+let best = Number(storage.get('best2048')) || 0;
+let won = false;      // آیا به ۲۰۴۸ رسیده‌ایم؟
+let over = false;     // آیا بازی تمام شده؟
+let animating = false;
+let prevState = null; // snapshot برای لغو حرکت: {values, score}
+let cell = 0;         // اندازه هر خانه به پیکسل (واکنش‌گرا)
+
+function emptyGrid(){
+  return Array.from({length: SIZE}, () => Array(SIZE).fill(null));
+}
+
+function buildCells(){
+  gridEl.innerHTML = '';
+  for(let i = 0; i < SIZE * SIZE; i++){
+    const c = document.createElement('div');
+    c.className = 'cell';
+    gridEl.appendChild(c);
+  }
+}
+
+function classFor(value){
+  return value <= WIN_VALUE ? 'tile-' + value : 'tile-super';
+}
+
+function fontSizeFor(value){
+  const digits = String(value).length;
+  return cell * (digits <= 2 ? 0.55 : digits === 3 ? 0.45 : 0.36);
+}
+
+function positionTile(tile){
+  tile.el.style.transform =
+    `translate(${tile.col * (cell + GAP)}px, ${tile.row * (cell + GAP)}px)`;
+}
+
+function styleTile(tile){
+  tile.el.style.width = tile.el.style.height = cell + 'px';
+  tile.el.style.fontSize = fontSizeFor(tile.value) + 'px';
+}
+
+function createTile(row, col, value, isNew){
+  const el = document.createElement('div');
+  el.className = 'tile ' + classFor(value);
+  el.textContent = value;
+  tilesEl.appendChild(el);
+  const tile = { row, col, value, el };
+  styleTile(tile);
+  positionTile(tile);
+  if(isNew) el.classList.add('new');
+  return tile;
+}
+
+// افزودن کاشی جدید (۲ با احتمال ۹۰٪، ۴ با احتمال ۱۰٪) در خانه خالی تصادفی
+function spawnTile(){
+  const empties = [];
+  for(let r = 0; r < SIZE; r++)
+    for(let c = 0; c < SIZE; c++)
+      if(!grid[r][c]) empties.push([r, c]);
+  if(!empties.length) return;
+  const [r, c] = empties[Math.floor(Math.random() * empties.length)];
+  grid[r][c] = createTile(r, c, Math.random() < 0.9 ? 2 : 4, true);
+}
+
+function updateScore(gained = 0){
+  scoreEl.textContent = faDigits(score);
+  if(score > best){
+    best = score;
+    storage.set('best2048', best);
+  }
+  bestEl.textContent = faDigits(best);
+  if(gained > 0){
+    const pop = document.createElement('div');
+    pop.className = 'score-add';
+    pop.textContent = '+' + faDigits(gained);
+    scoreEl.parentElement.appendChild(pop);
+    setTimeout(() => pop.remove(), 750);
+  }
+}
+
+// گرفتن snapshot از وضعیت فعلی برای لغو حرکت
+function takeSnapshot(){
+  return {
+    values: grid.map(row => row.map(t => (t ? t.value : 0))),
+    score,
+  };
+}
+
+function restoreSnapshot(snap){
+  tilesEl.innerHTML = '';
+  grid = emptyGrid();
+  for(let r = 0; r < SIZE; r++)
+    for(let c = 0; c < SIZE; c++)
+      if(snap.values[r][c])
+        grid[r][c] = createTile(r, c, snap.values[r][c], false);
+  score = snap.score;
+  updateScore();
+}
+
+// خطوط حرکت برای هر جهت (از لبه‌ای که کاشی‌ها به سمت آن می‌لغزند)
+function linesFor(dir){
+  const lines = [];
+  for(let i = 0; i < SIZE; i++){
+    const line = [];
+    for(let j = 0; j < SIZE; j++){
+      if(dir === 'left')  line.push([i, j]);
+      if(dir === 'right') line.push([i, SIZE - 1 - j]);
+      if(dir === 'up')    line.push([j, i]);
+      if(dir === 'down')  line.push([SIZE - 1 - j, i]);
+    }
+    lines.push(line);
+  }
+  return lines;
+}
+
+function move(dir){
+  if(animating || over || !overlayEl.hidden) return;
+  const snapshot = takeSnapshot();
+  let moved = false;
+  let gained = 0;
+  let reachedWin = false;
+  const absorbed = []; // کاشی‌هایی که در ادغام حذف می‌شوند
+  const merged = [];   // کاشی‌هایی که مقدارشان دو برابر شده
+
+  for(const line of linesFor(dir)){
+    const tiles = line.map(([r, c]) => grid[r][c]).filter(Boolean);
+    for(const [r, c] of line) grid[r][c] = null;
+
+    let target = 0;
+    let i = 0;
+    while(i < tiles.length){
+      const tile = tiles[i];
+      const [r, c] = line[target];
+      if(tile.row !== r || tile.col !== c) moved = true;
+      tile.row = r; tile.col = c;
+      grid[r][c] = tile;
+
+      const next = tiles[i + 1];
+      if(next && next.value === tile.value){
+        moved = true;
+        tile.value *= 2;
+        gained += tile.value;
+        if(tile.value === WIN_VALUE) reachedWin = true;
+        next.row = r; next.col = c; // کاشی جذب‌شده به سمت بازمانده می‌لغزد
+        absorbed.push(next);
+        merged.push(tile);
+        i += 2;
+      } else {
+        i += 1;
+      }
+      target++;
+    }
+  }
+
+  if(!moved) return; // حرکت نامعتبر: هیچ تغییری رخ نمی‌دهد
+
+  prevState = snapshot;
+  score += gained;
+  undoBtn.disabled = false;
+
+  // انیمیشن لغزش کاشی‌ها
+  for(const t of absorbed) t.el.style.zIndex = 1;
+  for(const row of grid)
+    for(const t of row)
+      if(t) positionTile(t);
+  for(const t of absorbed) positionTile(t);
+
+  // به‌روزرسانی ظاهر کاشی‌های ادغام‌شده (مقدار جدید + انیمیشن pop)
+  for(const t of merged){
+    t.el.className = 'tile ' + classFor(t.value) + ' merged';
+    t.el.textContent = t.value;
+    t.el.style.zIndex = 2;
+    styleTile(t);
+    t.el.addEventListener('animationend', () => t.el.classList.remove('merged'), { once: true });
+  }
+
+  updateScore(gained);
+
+  animating = true;
+  setTimeout(() => {
+    for(const t of absorbed) t.el.remove();
+    spawnTile();
+    animating = false;
+    if(reachedWin && !won){
+      won = true;
+      showOverlay(true);
+    } else if(!movesAvailable()){
+      over = true;
+      showOverlay(false);
+    }
+  }, MOVE_MS);
+}
+
+// آیا هنوز حرکتی ممکن است؟ (خانه خالی یا دو کاشی هم‌عدد مجاور)
+function movesAvailable(){
+  for(let r = 0; r < SIZE; r++)
+    for(let c = 0; c < SIZE; c++){
+      const t = grid[r][c];
+      if(!t) return true;
+      if(c + 1 < SIZE && grid[r][c + 1]?.value === t.value) return true;
+      if(r + 1 < SIZE && grid[r + 1][c]?.value === t.value) return true;
+    }
+  return false;
+}
+
+function showOverlay(isWin){
+  overlayTitle.textContent = isWin ? 'آفرین! برد!' : 'بازی تمام شد!';
+  overlayText.textContent = isWin
+    ? 'به کاشی ۲۰۴۸ رسیدید. می‌توانید ادامه دهید و رکورد بزنید!'
+    : 'دیگر حرکتی باقی نمانده است. امتیاز شما: ' + faDigits(score);
+  keepGoingBtn.hidden = !isWin;
+  overlayEl.hidden = false;
+}
+
+function hideOverlay(){ overlayEl.hidden = true; }
+
+function newGame(){
+  tilesEl.innerHTML = '';
+  grid = emptyGrid();
+  score = 0;
+  won = false;
+  over = false;
+  animating = false;
+  prevState = null;
+  undoBtn.disabled = true;
+  hideOverlay();
+  spawnTile();
+  spawnTile();
+  updateScore();
+}
+
+function undo(){
+  if(!prevState || animating) return;
+  restoreSnapshot(prevState);
+  prevState = null;
+  undoBtn.disabled = true;
+  over = false;
+  hideOverlay();
+}
+
+// چیدمان واکنش‌گرا: محاسبه اندازه خانه‌ها و قرار دادن کاشی‌ها
+function layout(){
+  if(!grid) return;
+  cell = (tilesEl.clientWidth - GAP * (SIZE - 1)) / SIZE;
+  for(const row of grid)
+    for(const t of row)
+      if(t){ styleTile(t); positionTile(t); }
+}
+
+new ResizeObserver(layout).observe(tilesEl);
+window.addEventListener('resize', layout);
+
+// ورودی صفحه‌کلید: جهت‌نما + WASD
+const KEYS = {
+  ArrowLeft: 'left', a: 'left', A: 'left',
+  ArrowRight: 'right', d: 'right', D: 'right',
+  ArrowUp: 'up', w: 'up', W: 'up',
+  ArrowDown: 'down', s: 'down', S: 'down',
+};
+window.addEventListener('keydown', e => {
+  if(KEYS[e.key]){
+    e.preventDefault();
+    move(KEYS[e.key]);
+  } else if(e.key === 'u' || e.key === 'U' || (e.ctrlKey && e.key === 'z')){
+    undo();
+  }
+});
+
+// ورودی لمسی/ماوس: کشیدن (swipe) روی صفحه بازی
+let swipeStart = null;
+boardEl.addEventListener('pointerdown', e => { swipeStart = [e.clientX, e.clientY]; });
+boardEl.addEventListener('pointerup', e => {
+  if(!swipeStart) return;
+  const dx = e.clientX - swipeStart[0];
+  const dy = e.clientY - swipeStart[1];
+  swipeStart = null;
+  if(Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+  move(Math.abs(dx) > Math.abs(dy)
+    ? (dx > 0 ? 'right' : 'left')
+    : (dy > 0 ? 'down' : 'up'));
+});
+boardEl.addEventListener('pointercancel', () => { swipeStart = null; });
+boardEl.addEventListener('contextmenu', e => e.preventDefault());
+
+// دکمه‌ها
+undoBtn.addEventListener('click', undo);
+newGameBtn.addEventListener('click', newGame);
+overlayRestartBtn.addEventListener('click', newGame);
+keepGoingBtn.addEventListener('click', hideOverlay);
+
+// شروع بازی
+buildCells();
+grid = emptyGrid();
+layout();
+newGame();
