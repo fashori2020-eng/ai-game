@@ -1,7 +1,7 @@
 {
   "name": "ai-game",
   "version": "1.0.0",
-  "description": "",
+  "description": "Bayan Quran — glassmorphism Quran study site (Persian)",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -19,9 +19,7 @@
     "url": "https://github.com/fashori2020-eng/ai-game/issues"
   },
   "homepage": "https://github.com/fashori2020-eng/ai-game#readme",
-  "dependencies": {
-    "three": "^0.187.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "vite": "^8.3.8"
   }
